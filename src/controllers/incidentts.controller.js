@@ -39,5 +39,6 @@ async function listMyIncidents(req, res) {
 }
 
 module.exports = {
-  createIncident
+  createIncident,
+  listMyIncidents
 };
