@@ -104,6 +104,38 @@ async function assignTechnician(req, res) {
   res.json(incident);
 }
 
+async function updateIncidentStatus(req, res) {
+  const id = Number(req.params.id);
+  const { status } = req.body;
+
+  const allowedStatuses = ['OPEN', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
+
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ message: 'Estado no válido' });
+  }
+
+  const incident = await prisma.incident.findUnique({ where: { id } });
+
+  if (!incident) {
+    return res.status(404).json({ message: 'Incidencia no encontrada' });
+  }
+
+  const isAdmin = req.user.role === 'ADMIN';
+  const isAssignedTechnician = incident.technicianId === req.user.id;
+
+  if (!isAdmin && !isAssignedTechnician) {
+    return res.status(403).json({ message: 'Solo el administrador o el técnico asignado pueden cambiar el estado' });
+  }
+
+  const updated = await prisma.incident.update({
+    where: { id },
+    data: { status },
+    include: includeRelations
+  });
+
+  res.json(updated);
+}
+
 module.exports = {
   createIncident,
   listMyIncidents
