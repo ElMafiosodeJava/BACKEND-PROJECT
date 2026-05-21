@@ -1,5 +1,15 @@
 const prisma = require('../lib/prisma');
 
+const includeRelations = {
+  reporter: { select: { id: true, name: true, email: true, role: true } },
+  technician: { select: { id: true, name: true, email: true, role: true } },
+  notes: {
+    include: {
+      author: { select: { id: true, name: true, email: true, role: true } }
+    }
+  }
+};
+
 async function createIncident(req, res) {
   const { title, description } = req.body;
 
@@ -15,15 +25,8 @@ async function createIncident(req, res) {
     }
   });
 
-  const includeRelations = {
-  reporter: { select: { id: true, name: true, email: true, role: true } },
-  technician: { select: { id: true, name: true, email: true, role: true } },
-  notes: {
-    include: {
-      author: { select: { id: true, name: true, email: true, role: true } }
-    }
-  }
-};
+  res.status(201).json(incident);
+}
 
 async function listMyIncidents(req, res) {
   const incidents = await prisma.incident.findMany({
@@ -33,9 +36,6 @@ async function listMyIncidents(req, res) {
   });
 
   res.json(incidents);
-}
-
-  res.status(201).json(incident);
 }
 
 async function listAssignedIncidents(req, res) {
@@ -210,5 +210,4 @@ async function listNotes(req, res) {
 
 module.exports = {
   createIncident,
-  listMyIncidents
 };
