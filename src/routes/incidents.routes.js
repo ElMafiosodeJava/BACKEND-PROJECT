@@ -3,7 +3,15 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const roleMiddleware = require('../middlewares/roleMiddleware');
 const {
   createIncident,
-  listMyIncidents
+  listMyIncidents,
+  listAssignedIncidents,
+  listAllIncidents,
+  getIncidentById,
+  assignTechnician,
+  updateIncidentStatus,
+  deleteIncident,
+  createNote,
+  listNotes
 } = require('../controllers/incidents.controller');
 
 const router = express.Router();
