@@ -1,0 +1,65 @@
+datasource db {
+  provider = "sqlite"
+  url = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  TECHNICIAN
+  ADMIN
+}
+
+enum IncidentStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+
+  reportedIncidents Incident[] @relation("Reporter")
+  assignedIncidents Incident[] @relation("Technician")
+  notes             Note[]
+}
+
+model Incident {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String
+  status      IncidentStatus @default(OPEN)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  reporterId   Int
+  technicianId Int?
+
+  reporter   User  @relation("Reporter", fields: [reporterId], references: [id])
+  technician User? @relation("Technician", fields: [technicianId], references: [id], onDelete: Cascade)
+
+  notes Note[]
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  content   String
+  createdAt DateTime @default(now())
+
+  incidentId Int
+  authorId   Int
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  author   User     @relation(fields: [authorId], references: [id])
+}
