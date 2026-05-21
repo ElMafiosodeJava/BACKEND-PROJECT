@@ -47,7 +47,36 @@ async function deleteTechnician(req, res) {
     return res.status(404).json({ message: 'Técnico no encontrado' });
   }
 
-  await prisma.user.delete({ where: { id } });
+  await prisma.$transaction(async (tx) => {
+    const assignedIncidents = await tx.incident.findMany({
+      where: { technicianId: id },
+      select: { id: true }
+    });
+
+    const incidentIds = assignedIncidents.map((incident) => incident.id);
+
+    if (incidentIds.length > 0) {
+      await tx.note.deleteMany({
+        where: {
+          incidentId: { in: incidentIds }
+        }
+      });
+
+      await tx.incident.deleteMany({
+        where: {
+          id: { in: incidentIds }
+        }
+      });
+    }
+
+    await tx.note.deleteMany({
+      where: { authorId: id }
+    });
+
+    await tx.user.delete({
+      where: { id }
+    });
+  });
 
   res.json({ message: 'Técnico eliminado correctamente' });
 }
