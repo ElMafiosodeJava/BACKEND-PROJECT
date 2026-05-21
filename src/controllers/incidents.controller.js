@@ -144,6 +144,70 @@ async function deleteIncident(req, res) {
   res.json({ message: 'Incidencia eliminada correctamente' });
 }
 
+async function createNote(req, res) {
+  const incidentId = Number(req.params.id);
+  const { title, content } = req.body;
+
+  if (!content) {
+    return res.status(400).json({ message: 'El contenido de la anotación es obligatorio' });
+  }
+
+  const incident = await prisma.incident.findUnique({ where: { id: incidentId } });
+
+  if (!incident) {
+    return res.status(404).json({ message: 'Incidencia no encontrada' });
+  }
+
+  const isAdmin = req.user.role === 'ADMIN';
+  const isAssignedTechnician = incident.technicianId === req.user.id;
+
+  if (!isAdmin && !isAssignedTechnician) {
+    return res.status(403).json({ message: 'Solo el técnico asignado o el administrador pueden añadir anotaciones' });
+  }
+
+  const note = await prisma.note.create({
+    data: {
+      incidentId,
+      authorId: req.user.id,
+      title,
+      content
+    },
+    include: {
+      author: { select: { id: true, name: true, email: true, role: true } }
+    }
+  });
+
+  res.status(201).json(note);
+}
+
+async function listNotes(req, res) {
+  const incidentId = Number(req.params.id);
+
+  const incident = await prisma.incident.findUnique({ where: { id: incidentId } });
+
+  if (!incident) {
+    return res.status(404).json({ message: 'Incidencia no encontrada' });
+  }
+
+  const isAdmin = req.user.role === 'ADMIN';
+  const isReporter = incident.reporterId === req.user.id;
+  const isAssignedTechnician = incident.technicianId === req.user.id;
+
+  if (!isAdmin && !isReporter && !isAssignedTechnician) {
+    return res.status(403).json({ message: 'No tienes permisos para ver estas anotaciones' });
+  }
+
+  const notes = await prisma.note.findMany({
+    where: { incidentId },
+    include: {
+      author: { select: { id: true, name: true, email: true, role: true } }
+    },
+    orderBy: { createdAt: 'asc' }
+  });
+
+  res.json(notes);
+}
+
 module.exports = {
   createIncident,
   listMyIncidents

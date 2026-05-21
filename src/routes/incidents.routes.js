@@ -16,4 +16,6 @@ router.get('/:id', authMiddleware, getIncidentById);
 router.patch('/:id/assign', authMiddleware, roleMiddleware('ADMIN'), assignTechnician);
 router.patch('/:id/status', authMiddleware, roleMiddleware('ADMIN', 'TECHNICIAN'), updateIncidentStatus);
 router.delete('/:id', authMiddleware, roleMiddleware('ADMIN'), deleteIncident);
+router.post('/:id/notes', authMiddleware, roleMiddleware('ADMIN', 'TECHNICIAN'), createNote);
+router.get('/:id/notes', authMiddleware, listNotes);
 module.exports = router;
