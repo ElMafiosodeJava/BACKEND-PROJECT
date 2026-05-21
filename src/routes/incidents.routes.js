@@ -10,5 +10,5 @@ const router = express.Router();
 
 router.get('/my', authMiddleware, roleMiddleware('USER'), listMyIncidents);
 router.post('/', authMiddleware, roleMiddleware('USER'), createIncident);
-
+router.get('/assigned', authMiddleware, roleMiddleware('TECHNICIAN'), listAssignedIncidents);
 module.exports = router;
