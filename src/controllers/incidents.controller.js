@@ -57,6 +57,29 @@ async function listAllIncidents(req, res) {
   res.json(incidents);
 }
 
+async function getIncidentById(req, res) {
+  const id = Number(req.params.id);
+
+  const incident = await prisma.incident.findUnique({
+    where: { id },
+    include: includeRelations
+  });
+
+  if (!incident) {
+    return res.status(404).json({ message: 'Incidencia no encontrada' });
+  }
+
+  const isAdmin = req.user.role === 'ADMIN';
+  const isReporter = incident.reporterId === req.user.id;
+  const isTechnician = incident.technicianId === req.user.id;
+
+  if (!isAdmin && !isReporter && !isTechnician) {
+    return res.status(403).json({ message: 'No tienes permisos para ver esta incidencia' });
+  }
+
+  res.json(incident);
+}
+
 module.exports = {
   createIncident,
   listMyIncidents
