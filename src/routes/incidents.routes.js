@@ -14,5 +14,5 @@ router.get('/assigned', authMiddleware, roleMiddleware('TECHNICIAN'), listAssign
 router.get('/', authMiddleware, roleMiddleware('ADMIN'), listAllIncidents);
 router.get('/:id', authMiddleware, getIncidentById);
 router.patch('/:id/assign', authMiddleware, roleMiddleware('ADMIN'), assignTechnician);
-
+router.patch('/:id/status', authMiddleware, roleMiddleware('ADMIN', 'TECHNICIAN'), updateIncidentStatus);
 module.exports = router;
