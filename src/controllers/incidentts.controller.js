@@ -15,6 +15,26 @@ async function createIncident(req, res) {
     }
   });
 
+  const includeRelations = {
+  reporter: { select: { id: true, name: true, email: true, role: true } },
+  technician: { select: { id: true, name: true, email: true, role: true } },
+  notes: {
+    include: {
+      author: { select: { id: true, name: true, email: true, role: true } }
+    }
+  }
+};
+
+async function listMyIncidents(req, res) {
+  const incidents = await prisma.incident.findMany({
+    where: { reporterId: req.user.id },
+    include: includeRelations,
+    orderBy: { createdAt: 'desc' }
+  });
+
+  res.json(incidents);
+}
+
   res.status(201).json(incident);
 }
 

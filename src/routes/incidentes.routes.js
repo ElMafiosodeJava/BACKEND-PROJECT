@@ -5,6 +5,7 @@ const { createIncident } = require('../controllers/incidents.controller');
 
 const router = express.Router();
 
+router.get('/my', authMiddleware, roleMiddleware('USER'), listMyIncidents);
 router.post('/', authMiddleware, roleMiddleware('USER'), createIncident);
 
 module.exports = router;
