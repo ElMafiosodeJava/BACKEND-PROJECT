@@ -210,4 +210,13 @@ async function listNotes(req, res) {
 
 module.exports = {
   createIncident,
+   listMyIncidents,
+  listAssignedIncidents,
+  listAllIncidents,
+  getIncidentById,
+  assignTechnician,
+  updateIncidentStatus,
+  deleteIncident,
+  createNote,
+  listNotes
 };
