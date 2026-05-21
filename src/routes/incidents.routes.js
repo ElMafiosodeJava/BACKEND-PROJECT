@@ -12,5 +12,6 @@ router.get('/my', authMiddleware, roleMiddleware('USER'), listMyIncidents);
 router.post('/', authMiddleware, roleMiddleware('USER'), createIncident);
 router.get('/assigned', authMiddleware, roleMiddleware('TECHNICIAN'), listAssignedIncidents);
 router.get('/', authMiddleware, roleMiddleware('ADMIN'), listAllIncidents);
+router.get('/:id', authMiddleware, getIncidentById);
 
 module.exports = router;
