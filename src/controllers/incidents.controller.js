@@ -48,6 +48,15 @@ async function listAssignedIncidents(req, res) {
   res.json(incidents);
 }
 
+async function listAllIncidents(req, res) {
+  const incidents = await prisma.incident.findMany({
+    include: includeRelations,
+    orderBy: { createdAt: 'desc' }
+  });
+
+  res.json(incidents);
+}
+
 module.exports = {
   createIncident,
   listMyIncidents
