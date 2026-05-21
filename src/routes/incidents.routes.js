@@ -13,5 +13,6 @@ router.post('/', authMiddleware, roleMiddleware('USER'), createIncident);
 router.get('/assigned', authMiddleware, roleMiddleware('TECHNICIAN'), listAssignedIncidents);
 router.get('/', authMiddleware, roleMiddleware('ADMIN'), listAllIncidents);
 router.get('/:id', authMiddleware, getIncidentById);
+router.patch('/:id/assign', authMiddleware, roleMiddleware('ADMIN'), assignTechnician);
 
 module.exports = router;

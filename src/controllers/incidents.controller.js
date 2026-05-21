@@ -80,6 +80,30 @@ async function getIncidentById(req, res) {
   res.json(incident);
 }
 
+async function assignTechnician(req, res) {
+  const id = Number(req.params.id);
+  const { technicianId } = req.body;
+
+  const technician = await prisma.user.findFirst({
+    where: { id: Number(technicianId), role: 'TECHNICIAN' }
+  });
+
+  if (!technician) {
+    return res.status(404).json({ message: 'Técnico no encontrado' });
+  }
+
+  const incident = await prisma.incident.update({
+    where: { id },
+    data: {
+      technicianId: Number(technicianId),
+      status: 'ASSIGNED'
+    },
+    include: includeRelations
+  });
+
+  res.json(incident);
+}
+
 module.exports = {
   createIncident,
   listMyIncidents
