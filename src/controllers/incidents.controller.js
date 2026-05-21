@@ -136,6 +136,14 @@ async function updateIncidentStatus(req, res) {
   res.json(updated);
 }
 
+async function deleteIncident(req, res) {
+  const id = Number(req.params.id);
+
+  await prisma.incident.delete({ where: { id } });
+
+  res.json({ message: 'Incidencia eliminada correctamente' });
+}
+
 module.exports = {
   createIncident,
   listMyIncidents
